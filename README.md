@@ -1,6 +1,6 @@
 # foundry-fund-me
 
 ```
-Basic Fund Me Project in Solidity using Foundry
+Basic Fund Me Project in Solidity.
 
 ```
