@@ -17,6 +17,7 @@ contract FundMeTest is Test {
     address public USER = makeAddr("user");
     uint256 public constant SEND_ETH_VALUE = 1e17; //0.1ETH
     uint256 public constant STARTING_USER_BALANCE = 10e18; //10ETH
+    uint256 public constant GAS_PRICE = 1; // price of 1 unit of gas
 
     function setUp() external {
         // fundMe = new FundMe();
@@ -49,11 +50,86 @@ contract FundMeTest is Test {
         fundMe.fund();
     }
 
-    function test_UpdatesTheAddressToAmountFunded() public {
+    function test_FundUpdatesTheAddressToAmountFundedDS() public {
         vm.prank(USER); // The next TX will be sent by the USER
         fundMe.fund{value: SEND_ETH_VALUE}(); // USER will call this fn and send ETH
+        // modifier is not used, to understand the above lines.
         uint256 amountFunded = fundMe.getAddressToAmountFunded(USER);
         assertEq(amountFunded, SEND_ETH_VALUE);
-        assertEq(fundMe.getFunder(0), USER);
+    }
+
+    // State Tree
+    modifier funded() {
+        vm.prank(USER);
+        fundMe.fund{value: SEND_ETH_VALUE}();
+        _;
+    }
+
+    function test_AddsFunderToArrayOfFunders() public funded {
+        address funder = fundMe.getFunder(0);
+        assertEq(funder, USER);
+    }
+
+    function test_RevertIfWithdrawIsNotCalledByOwner() public funded {
+        vm.expectRevert();
+        vm.prank(USER); // since it is also vm, expectRevert will ignore this line and expect next line to revert
+        fundMe.withdraw();
+    }
+
+    function test_WithdrawWithASingleFunder() public funded {
+        // Arrange
+        address owner = fundMe.getOwner();
+        uint256 startingOwnerBalance = owner.balance;
+        uint256 startingFundMeBalance = address(fundMe).balance;
+
+        // Act
+        vm.prank(owner);
+        fundMe.withdraw();
+
+        // Assert
+        uint256 endingOwnerBalance = owner.balance;
+        uint256 endingFundMeBalance = address(fundMe).balance;
+        assertEq(endingFundMeBalance, 0);
+        assertEq(
+            startingFundMeBalance + startingOwnerBalance,
+            endingOwnerBalance
+        );
+    }
+
+    function test_WithdrawWithMultipleFunders() public funded {
+        //Arrange
+        uint160 numberOfFunders = 10;
+        // To generate addresses from numbers, it should be uint160.
+        // eg address(1); // this will give a new random address
+        uint160 startingFunderIndex = 1;
+
+        for (uint160 i = startingFunderIndex; i < numberOfFunders; i++) {
+            hoax(address(i), STARTING_USER_BALANCE);
+            fundMe.fund{value: SEND_ETH_VALUE}();
+        }
+
+        address owner = fundMe.getOwner();
+        uint256 startingOwnerBalance = owner.balance;
+        uint256 startingFundMeBalance = address(fundMe).balance;
+
+        //Act
+        // uint256 gasStart = gasleft();
+        vm.txGasPrice(GAS_PRICE);
+        vm.startPrank(owner);
+        fundMe.withdraw();
+        vm.stopPrank();
+        // uint256 gasEnd = gasleft();
+        // uint256 gasUsed = (gasStart - gasEnd) * tx.gasprice;
+
+        // Assert
+        uint256 endingOwnerBalance = owner.balance;
+        uint256 endingFundMeBalance = address(fundMe).balance;
+        assert(endingFundMeBalance == 0);
+        assert(
+            startingFundMeBalance + startingOwnerBalance == endingOwnerBalance
+        );
+        // Eventhough we are calling functions in the blockchain
+        // No gas is used. This is because of Anvil
+        // In Anvil gas price is default to 0.
     }
 }

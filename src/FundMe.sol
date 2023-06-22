@@ -45,13 +45,34 @@ contract FundMe {
         s_addressToAmountFunded[msg.sender] += msg.value;
     }
 
+    // function withdraw() public onlyOwner {
+    //     for (
+    //         uint256 funderIndex = 0;
+    //         funderIndex < s_funders.length;
+    //         funderIndex++
+    //     ) {
+    //         address funder = s_funders[funderIndex];
+    //         s_addressToAmountFunded[funder] = 0;
+    //     }
+    //     s_funders = new address[](0);
+    //     // we are resetting the array.
+    //     // (0) -> we are asking to start at 0.
+
+    //     (bool sent, ) = payable(msg.sender).call{value: address(this).balance}(
+    //         ""
+    //     );
+    //     if (!sent) revert FundMe__WITHDRAW_FAILED();
+    // }
+
+    //This is a cheaper withdraw function comparing to the above one
     function withdraw() public onlyOwner {
+        address[] memory existingFunders = s_funders;
         for (
             uint256 funderIndex = 0;
-            funderIndex < s_funders.length;
+            funderIndex < existingFunders.length;
             funderIndex++
         ) {
-            address funder = s_funders[funderIndex];
+            address funder = existingFunders[funderIndex];
             s_addressToAmountFunded[funder] = 0;
         }
         s_funders = new address[](0);
@@ -61,9 +82,6 @@ contract FundMe {
         (bool sent, ) = payable(msg.sender).call{value: address(this).balance}(
             ""
         );
-        // require(sent, "Withdraw Failed!");
-        // this has been modified to below statement for gas optimization
-        // see onlyowner fn for more details
         if (!sent) revert FundMe__WITHDRAW_FAILED();
     }
 
