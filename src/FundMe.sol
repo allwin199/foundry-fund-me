@@ -13,17 +13,18 @@ error FundMe__WITHDRAW_FAILED();
 error FundMe__NOT_ENOUGH_ETH();
 
 contract FundMe {
-    address public immutable i_owner;
+    address private immutable i_owner;
 
     using PriceConverter for uint256;
     // Attaching PriceConverter library to all uin256
     // now all uint256 will have access to PriceConverter library
 
-    uint256 public constant MINIMUM_USD = 5 * 1e18;
+    uint256 private constant MINIMUM_USD = 5 * 1e18;
     // since priceInUsd will have 18 deciamls, we also need minimum usd to have 18 decimals;
 
-    address[] public s_funders;
-    mapping(address funder => uint256 amountFunded) public addresToAmountFunded;
+    address[] private s_funders;
+    mapping(address funder => uint256 amountFunded)
+        private s_addressToAmountFunded;
 
     AggregatorV3Interface private s_priceFeed;
 
@@ -34,7 +35,6 @@ contract FundMe {
 
     function getVersion() public view returns (uint256) {
         return s_priceFeed.version();
-        // This address will work only on sepolia test
     }
 
     function fund() public payable {
@@ -42,7 +42,7 @@ contract FundMe {
         // require(ethPriceInUsd >= MINIMUM_USD, "Minimum of 5 USD is required");
         if (ethPriceInUsd < MINIMUM_USD) revert FundMe__NOT_ENOUGH_ETH();
         s_funders.push(msg.sender);
-        addresToAmountFunded[msg.sender] += msg.value;
+        s_addressToAmountFunded[msg.sender] += msg.value;
     }
 
     function withdraw() public onlyOwner {
@@ -52,7 +52,7 @@ contract FundMe {
             funderIndex++
         ) {
             address funder = s_funders[funderIndex];
-            addresToAmountFunded[funder] = 0;
+            s_addressToAmountFunded[funder] = 0;
         }
         s_funders = new address[](0);
         // we are resetting the array.
@@ -88,6 +88,31 @@ contract FundMe {
     // If none of the function is matched, it will look for the fallback()
     fallback() external payable {
         fund();
+    }
+
+    /**
+     * View / Pure functions(Getters)
+     */
+    function getAddressToAmountFunded(
+        address _fundingAddress
+    ) external view returns (uint256) {
+        return s_addressToAmountFunded[_fundingAddress];
+    }
+
+    function getFunder(uint256 _index) external view returns (address) {
+        return s_funders[_index];
+    }
+
+    function getOwner() external view returns (address) {
+        return i_owner;
+    }
+
+    function getMinimumUsd() external pure returns (uint256) {
+        return MINIMUM_USD;
+    }
+
+    function getPriceFeedAddress() external view returns (address) {
+        return address(s_priceFeed);
     }
 }
 

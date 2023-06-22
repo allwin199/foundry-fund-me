@@ -6,13 +6,11 @@ import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/Ag
 // Solidity only works with whole numbers
 
 library PriceConverter {
-    function getPrice(
-        AggregatorV3Interface _priceFeed
-    ) internal view returns (uint256) {
+    function getPrice(AggregatorV3Interface _priceFeed) internal view returns (uint256) {
         // AggregatorV3Interface priceFeed = AggregatorV3Interface(
         //     0x694AA1769357215DE4FAC081bf1f309aDC325306
         // );
-        (, int256 price, , , ) = _priceFeed.latestRoundData();
+        (, int256 price,,,) = _priceFeed.latestRoundData();
 
         // this price will return a number with 8 decimal places.
         // msg.value will be 18 decimal places, because of wei
@@ -26,10 +24,7 @@ library PriceConverter {
         return uint256(price * 1e10);
     }
 
-    function getConversionRate(
-        uint256 ethAmount,
-        AggregatorV3Interface _priceFeed
-    ) internal view returns (uint256) {
+    function getConversionRate(uint256 ethAmount, AggregatorV3Interface _priceFeed) internal view returns (uint256) {
         // 1 ETH ?
         // To get the price of 1 ETH in USD, we are calling the getPrice()
 
