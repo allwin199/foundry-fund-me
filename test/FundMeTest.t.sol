@@ -30,14 +30,5 @@ contract FundMeTest is Test {
     function testGetVersionOfV3Interface() public {
         uint256 version = fundMe.getVersion();
         assertEq(version, 4);
-        ////////////////////////
-        // If we run this test we will get "EvmError: Revert"
-        // 0x694AA1769357215DE4FAC081bf1f309aDC325306::version()
-        // testfn is trying to call version() on this contract
-        // but this contract is only available on sepolia testnet
-        // while using local nodes(anvil) this will revert
-        /////////////////////////
-        // forge test --match-test testGetVersionOfV3Interface -vvvv --fork-url $SEPOLIA_RPC_URL
-        // now when this test run, since fork url is provided anvil will simulate sepolia testnet.
     }
 }

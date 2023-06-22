@@ -14,7 +14,6 @@ library PriceConverter {
         // );
         (, int256 price, , , ) = _priceFeed.latestRoundData();
 
-        // this address will work only on sepolia testnet
         // this price will return a number with 8 decimal places.
         // msg.value will be 18 decimal places, because of wei
         // we have to convert this price to wei.
