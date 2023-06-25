@@ -1,22 +1,22 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.18;
+// pragma solidity ^0.8.18;
 
-contract Storage {
-    uint256 favouriteNumber;
-    bool someBool;
-    uint256[] myArray;
+// contract Storage {
+//     uint256 favouriteNumber;
+//     bool someBool;
+//     uint256[] myArray;
 
-    constructor() {
-        favouriteNumber = 25;
-        someBool = true;
-        myArray.push(22);
-    }
+//     constructor() {
+//         favouriteNumber = 25;
+//         someBool = true;
+//         myArray.push(22);
+//     }
 
-    function addFive() public {
-        uint256 newFavNumber = favouriteNumber + 5;
-        string memory name = "Name";
-    }
-}
+//     function addFive() public {
+//         uint256 newFavNumber = favouriteNumber + 5;
+//         string memory name = "Name";
+//     }
+// }
 
 // Explanation about Storage
 
