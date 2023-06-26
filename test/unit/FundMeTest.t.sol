@@ -2,9 +2,9 @@
 pragma solidity ^0.8.18;
 
 import {Test, console} from "forge-std/Test.sol";
-import {FundMe, FundMe__NOT_ENOUGH_ETH} from "../src/FundMe.sol";
-import {DeployFundMe} from "../script/DeployFundMe.s.sol";
-import {HelperConfig} from "../script/HelperConfig.s.sol";
+import {FundMe} from "../../src/FundMe.sol";
+import {DeployFundMe} from "../../script/DeployFundMe.s.sol";
+import {HelperConfig} from "../../script/HelperConfig.s.sol";
 
 // we are inherting everything from Test contract
 contract FundMeTest is Test {
@@ -133,3 +133,9 @@ contract FundMeTest is Test {
         // In Anvil gas price is default to 0.
     }
 }
+
+// To run all the test in local env
+// forge test
+
+// To simulate a Test net env
+// forge test --fork-url $SEPOLIA_RPC_URL
