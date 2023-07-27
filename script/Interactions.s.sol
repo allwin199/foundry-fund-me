@@ -45,7 +45,7 @@ contract WithdrawFundMe is Script {
     }
 }
 
-// To interact with the contract, the contract should be already deployed.abi
+// To interact with the contract, the contract should be already deployed.
 // anvil
 // NOTE: for sepolia use $SEPOLIA_RPC_URL and $SEPOLIA_PRIVATE_KEY
 // forge script script/DeployFundMe.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
